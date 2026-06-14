@@ -17,8 +17,15 @@ export const users: User[] = [
   {
     id: "client-1",
     name: "Cliente Dona Lu",
+    fullName: "Cliente Dona Lu",
     email: "cliente@doceria.com",
+    phone: "(11) 99999-1111",
+    avatar: "",
     role: "client",
+    createdAt: "2026-06-01",
+    marketingConsent: true,
+    lastActiveAt: "2026-06-14",
+    password: "123456",
     preferences: {
       notifications: true,
       theme: "light",
@@ -27,8 +34,15 @@ export const users: User[] = [
   {
     id: "admin-1",
     name: "Admin Dona Lu",
+    fullName: "Admin Dona Lu",
     email: "admin@doceria.com",
+    phone: "(11) 99999-2222",
+    avatar: "",
     role: "admin",
+    createdAt: "2026-05-20",
+    marketingConsent: false,
+    lastActiveAt: "2026-06-14",
+    password: "123456",
     preferences: {
       notifications: true,
       theme: "light",

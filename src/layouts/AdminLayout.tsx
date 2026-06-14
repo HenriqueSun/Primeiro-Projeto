@@ -8,12 +8,18 @@ import {
   Package,
   Settings,
   Star,
+  UsersRound,
   Vote,
 } from "lucide-react";
 import { AppLayout } from "@/layouts/AppLayout";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: <Home className="h-5 w-5" /> },
+  {
+    label: "Usuários",
+    href: "/admin/usuarios",
+    icon: <UsersRound className="h-5 w-5" />,
+  },
   {
     label: "Produtos",
     href: "/admin/produtos",

@@ -9,26 +9,38 @@ import {
   products,
   promotions,
   settings,
+  users,
   votes,
 } from "@/mocks/data";
 import type {
+  AuthSession,
   Coupon,
   Feedback,
   FeedbackStatus,
   LoyaltyAccount,
+  LoginDTO,
   MarketingMetrics,
   Notification,
   Product,
   ProductStatus,
   Promotion,
+  RegisterDTO,
   Settings,
-  User,
-  Vote,
   SocialPlatform,
+  User,
+  UserRole,
+  Vote,
 } from "@/types";
+import {
+  createMockSession,
+  normalizeEmail,
+  normalizeFullName,
+} from "@/utils/auth";
 
 type AppState = {
   user: User | null;
+  users: User[];
+  session: AuthSession | null;
   sidebarOpen: boolean;
   products: Product[];
   votes: Vote[];
@@ -42,6 +54,10 @@ type AppState = {
   searchHistory: string[];
   settings: Settings;
   setUser: (user: User | null) => void;
+  loginUser: (dto: LoginDTO, role: UserRole) => User;
+  registerUser: (dto: RegisterDTO) => User;
+  updateProfile: (profile: Partial<User>) => void;
+  requestPasswordReset: (email: string) => void;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
   addProduct: (product: Product) => void;
@@ -76,6 +92,8 @@ export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       user: null,
+      users,
+      session: null,
       sidebarOpen: true,
       products,
       votes,
@@ -88,7 +106,105 @@ export const useAppStore = create<AppState>()(
       favoriteProductIds: ["p-1", "p-3"],
       searchHistory: ["brigadeiro", "bolo de pote"],
       settings,
-      setUser: (user) => set({ user }),
+      setUser: (user) => set({ user, session: user ? createMockSession() : null }),
+      loginUser: (dto, role) => {
+        let loggedUser: User | undefined;
+
+        set((state) => {
+          const email = normalizeEmail(dto.email);
+          const foundUser = state.users.find(
+            (item) => item.email === email && item.role === role,
+          );
+
+          const passwordMatches = foundUser?.password
+            ? foundUser.password === dto.password
+            : dto.password.length >= 6;
+
+          if (!foundUser || !passwordMatches) {
+            throw new Error("E-mail ou senha inválidos.");
+          }
+
+          loggedUser = {
+            ...foundUser,
+            lastActiveAt: new Date().toISOString().slice(0, 10),
+          };
+
+          return {
+            user: loggedUser,
+            session: createMockSession(),
+            users: state.users.map((item) =>
+              item.id === loggedUser?.id ? loggedUser : item,
+            ),
+          };
+        });
+
+        if (!loggedUser) {
+          throw new Error("Não foi possível entrar.");
+        }
+
+        return loggedUser;
+      },
+      registerUser: (dto) => {
+        let createdUser: User | undefined;
+
+        set((state) => {
+          const email = normalizeEmail(dto.email);
+
+          if (state.users.some((item) => item.email === email)) {
+            throw new Error("Já existe uma conta com este e-mail.");
+          }
+
+          const fullName = normalizeFullName(dto.fullName);
+          createdUser = {
+            id: crypto.randomUUID(),
+            name: fullName,
+            fullName,
+            email,
+            phone: dto.phone,
+            avatar: "",
+            avatarUrl: "",
+            role: "client",
+            createdAt: new Date().toISOString().slice(0, 10),
+            marketingConsent: dto.marketingConsent,
+            password: dto.password,
+            preferences: {
+              notifications: true,
+              theme: "light",
+            },
+          };
+
+          return { users: [createdUser, ...state.users] };
+        });
+
+        if (!createdUser) {
+          throw new Error("Não foi possível criar a conta.");
+        }
+
+        return createdUser;
+      },
+      updateProfile: (profile) =>
+        set((state) => {
+          if (!state.user) return state;
+
+          const nextUser: User = {
+            ...state.user,
+            ...profile,
+            name: profile.fullName ?? profile.name ?? state.user.name,
+          };
+
+          return {
+            user: nextUser,
+            users: state.users.map((item) =>
+              item.id === nextUser.id ? nextUser : item,
+            ),
+          };
+        }),
+      requestPasswordReset: (email) => {
+        const normalized = normalizeEmail(email);
+        if (!normalized.includes("@")) {
+          throw new Error("Informe um e-mail válido.");
+        }
+      },
       toggleSidebar: () =>
         set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
@@ -283,6 +399,8 @@ export const useAppStore = create<AppState>()(
       name: "doceria-dona-lu-store",
       partialize: (state) => ({
         user: state.user,
+        users: state.users,
+        session: state.session,
         sidebarOpen: state.sidebarOpen,
         products: state.products,
         votes: state.votes,

@@ -1,4 +1,5 @@
-import { Save } from "lucide-react";
+import { Camera, Save, Trash2 } from "lucide-react";
+import type { ChangeEvent } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
@@ -6,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/form";
 import { useAppStore } from "@/store/appStore";
+import { formatBrazilianPhone } from "@/utils/auth";
 import { getInitials } from "@/utils/formatters";
 
 export function ClientProfilePage() {
   const user = useAppStore((state) => state.user);
-  const setUser = useAppStore((state) => state.setUser);
-  const [name, setName] = useState(user?.name ?? "");
-  const [email, setEmail] = useState(user?.email ?? "");
+  const updateProfile = useAppStore((state) => state.updateProfile);
+  const [name, setName] = useState(user?.fullName ?? user?.name ?? "");
+  const [phone, setPhone] = useState(user?.phone ?? "");
+  const [avatar, setAvatar] = useState(user?.avatar ?? user?.avatarUrl ?? "");
   const [theme, setTheme] = useState(user?.preferences.theme ?? "light");
   const [notifications, setNotifications] = useState(
     user?.preferences.notifications ?? true,
@@ -20,16 +23,28 @@ export function ClientProfilePage() {
 
   const save = () => {
     if (!user) return;
-    setUser({
+    updateProfile({
       ...user,
+      fullName: name,
       name,
-      email,
+      phone,
+      avatar,
+      avatarUrl: avatar,
       preferences: {
         theme,
         notifications,
       },
     });
     toast.success("Perfil atualizado.");
+  };
+
+  const handleAvatarUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => setAvatar(String(reader.result));
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -49,13 +64,38 @@ export function ClientProfilePage() {
         <Card>
           <CardContent className="p-6 text-center">
             <div className="mx-auto grid h-28 w-28 place-items-center rounded-full bg-secondary text-3xl font-black text-primary">
-              {getInitials(name || "Cliente")}
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt="Foto de perfil"
+                  className="h-full w-full rounded-full object-cover"
+                />
+              ) : (
+                getInitials(name || "Cliente")
+              )}
             </div>
             <h2 className="mt-4 text-xl font-bold">{name}</h2>
-            <p className="text-sm text-muted-foreground">{email}</p>
-            <Button variant="outline" className="mt-5 w-full">
-              Alterar foto
-            </Button>
+            <p className="text-sm text-muted-foreground">{user?.email}</p>
+            <div className="mt-5 grid gap-2">
+              <Button variant="outline" className="w-full" asChild>
+                <label>
+                  <Camera className="h-4 w-4" />
+                  Alterar foto
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={handleAvatarUpload}
+                  />
+                </label>
+              </Button>
+              {avatar ? (
+                <Button variant="ghost" className="w-full" onClick={() => setAvatar("")}>
+                  <Trash2 className="h-4 w-4" />
+                  Remover foto
+                </Button>
+              ) : null}
+            </div>
           </CardContent>
         </Card>
 
@@ -78,8 +118,20 @@ export function ClientProfilePage() {
                 <Input
                   id="email"
                   type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  value={user?.email ?? ""}
+                  disabled
+                  readOnly
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="phone">Telefone</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  inputMode="tel"
+                  value={phone}
+                  onChange={(event) => setPhone(formatBrazilianPhone(event.target.value))}
+                  placeholder="(11) 99999-9999"
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">

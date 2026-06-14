@@ -26,9 +26,16 @@ export type SocialPlatform = "instagram" | "whatsapp" | "facebook" | "tiktok";
 export interface User {
   id: string;
   name: string;
+  fullName: string;
   email: string;
+  phone: string;
+  avatar?: string;
   role: UserRole;
   avatarUrl?: string;
+  createdAt: string;
+  marketingConsent: boolean;
+  lastActiveAt?: string;
+  password?: string;
   preferences: {
     notifications: boolean;
     theme: "light" | "dark";
@@ -186,4 +193,25 @@ export interface DashboardKpis {
   totalVotes: number;
   receivedFeedbacks: number;
   topVotedProduct: string;
+}
+
+export interface RegisterDTO {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+  acceptedTerms: boolean;
+  marketingConsent: boolean;
+}
+
+export interface LoginDTO {
+  email: string;
+  password: string;
+}
+
+export interface AuthSession {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: string;
 }

@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, CakeSlice, Lock, Mail } from "lucide-react";
+import { Apple, ArrowRight, CakeSlice, Chrome, Lock, Mail, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FieldError, Input, Label } from "@/components/ui/form";
-import { loginMock } from "@/services/mockApi";
 import { useAppStore } from "@/store/appStore";
-import type { UserRole } from "@/types";
+import type { LoginDTO, UserRole } from "@/types";
 import { cn } from "@/utils/cn";
 
 const schema = z.object({
@@ -29,7 +28,7 @@ type LoginForm = z.infer<typeof schema>;
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const setUser = useAppStore((state) => state.setUser);
+  const loginUser = useAppStore((state) => state.loginUser);
   const [role, setRole] = useState<UserRole>("client");
   const [loading, setLoading] = useState(false);
   const {
@@ -48,8 +47,7 @@ export function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     try {
       setLoading(true);
-      const user = await loginMock(data.email, role);
-      setUser(user);
+      const user = loginUser(data as LoginDTO, role);
       toast.success(`Bem-vindo, ${user.name}!`);
       navigate(role === "admin" ? "/admin" : "/cliente", { replace: true });
     } catch (error) {
@@ -96,6 +94,19 @@ export function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="mb-4 grid gap-2 sm:grid-cols-3">
+              {[
+                { icon: <Chrome className="h-4 w-4" />, label: "Google" },
+                { icon: <Apple className="h-4 w-4" />, label: "Apple" },
+                { icon: <Share2 className="h-4 w-4" />, label: "Facebook" },
+              ].map((item) => (
+                <Button key={item.label} variant="outline" disabled className="min-h-11">
+                  {item.icon}
+                  {item.label}
+                </Button>
+              ))}
+            </div>
+
             <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl bg-secondary p-1">
               {[
                 { value: "client", label: "Cliente" },
@@ -127,6 +138,9 @@ export function LoginPage() {
                     type="email"
                     className="pl-9"
                     placeholder="voce@email.com"
+                    autoComplete="email"
+                    inputMode="email"
+                    aria-invalid={Boolean(errors.email)}
                     {...register("email")}
                   />
                 </div>
@@ -142,6 +156,8 @@ export function LoginPage() {
                     type="password"
                     className="pl-9"
                     placeholder="Sua senha"
+                    autoComplete="current-password"
+                    aria-invalid={Boolean(errors.password)}
                     {...register("password")}
                   />
                 </div>
@@ -153,9 +169,9 @@ export function LoginPage() {
                   <input type="checkbox" className="h-4 w-4" {...register("remember")} />
                   Lembrar usuário
                 </label>
-                <a href="#recuperar" className="font-semibold text-primary">
+                <Link to="/forgot-password" className="font-semibold text-primary">
                   Recuperar senha
-                </a>
+                </Link>
               </div>
 
               <Button className="w-full" size="lg" disabled={loading}>
@@ -163,6 +179,12 @@ export function LoginPage() {
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </form>
+            <div className="mt-5 rounded-xl border bg-secondary/50 p-4 text-center text-sm">
+              <p className="text-muted-foreground">Ainda não possui cadastro?</p>
+              <Button className="mt-3 w-full" variant="outline" asChild>
+                <Link to="/register">Criar Conta</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

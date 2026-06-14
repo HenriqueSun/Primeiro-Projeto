@@ -7,6 +7,9 @@ import { useAppStore } from "@/store/appStore";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const LoginPage = lazy(() => import("@/pages/LoginPage").then((module) => ({ default: module.LoginPage })));
+const RegisterPage = lazy(() => import("@/pages/RegisterPage").then((module) => ({ default: module.RegisterPage })));
+const RegisterSuccessPage = lazy(() => import("@/pages/RegisterSuccessPage").then((module) => ({ default: module.RegisterSuccessPage })));
+const ForgotPasswordPage = lazy(() => import("@/pages/ForgotPasswordPage").then((module) => ({ default: module.ForgotPasswordPage })));
 const ClientDashboard = lazy(() => import("@/pages/client/ClientDashboard").then((module) => ({ default: module.ClientDashboard })));
 const ClientVotingPage = lazy(() => import("@/pages/client/ClientVotingPage").then((module) => ({ default: module.ClientVotingPage })));
 const ClientFeedbackPage = lazy(() => import("@/pages/client/ClientFeedbackPage").then((module) => ({ default: module.ClientFeedbackPage })));
@@ -16,6 +19,7 @@ const ClientLoyaltyPage = lazy(() => import("@/pages/client/ClientLoyaltyPage").
 const ClientCouponsPage = lazy(() => import("@/pages/client/ClientCouponsPage").then((module) => ({ default: module.ClientCouponsPage })));
 const ClientProfilePage = lazy(() => import("@/pages/client/ClientProfilePage").then((module) => ({ default: module.ClientProfilePage })));
 const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard").then((module) => ({ default: module.AdminDashboard })));
+const AdminUsersPage = lazy(() => import("@/pages/admin/AdminUsersPage").then((module) => ({ default: module.AdminUsersPage })));
 const AdminProductsPage = lazy(() => import("@/pages/admin/AdminProductsPage").then((module) => ({ default: module.AdminProductsPage })));
 const AdminVotesPage = lazy(() => import("@/pages/admin/AdminVotesPage").then((module) => ({ default: module.AdminVotesPage })));
 const AdminPromotionsPage = lazy(() => import("@/pages/admin/AdminPromotionsPage").then((module) => ({ default: module.AdminPromotionsPage })));
@@ -34,40 +38,44 @@ export function App() {
       <Routes>
         <Route path="/" element={<Navigate to={user ? home : "/login"} replace />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register/success" element={<RegisterSuccessPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-      <Route element={<ProtectedRoute role="client" />}>
-        <Route element={<ClientLayout />}>
-          <Route path="/cliente" element={<ClientDashboard />} />
-          <Route path="/cliente/votacao" element={<ClientVotingPage />} />
-          <Route path="/cliente/feedbacks" element={<ClientFeedbackPage />} />
-          <Route path="/cliente/cardapio" element={<ClientMenuPage />} />
-          <Route path="/cliente/favoritos" element={<ClientFavoritesPage />} />
-          <Route path="/cliente/fidelidade" element={<ClientLoyaltyPage />} />
-          <Route path="/cliente/cupons" element={<ClientCouponsPage />} />
-          <Route path="/cliente/perfil" element={<ClientProfilePage />} />
+        <Route element={<ProtectedRoute role="client" />}>
+          <Route element={<ClientLayout />}>
+            <Route path="/cliente" element={<ClientDashboard />} />
+            <Route path="/cliente/votacao" element={<ClientVotingPage />} />
+            <Route path="/cliente/feedbacks" element={<ClientFeedbackPage />} />
+            <Route path="/cliente/cardapio" element={<ClientMenuPage />} />
+            <Route path="/cliente/favoritos" element={<ClientFavoritesPage />} />
+            <Route path="/cliente/fidelidade" element={<ClientLoyaltyPage />} />
+            <Route path="/cliente/cupons" element={<ClientCouponsPage />} />
+            <Route path="/cliente/perfil" element={<ClientProfilePage />} />
+          </Route>
         </Route>
-      </Route>
 
-      <Route element={<ProtectedRoute role="admin" />}>
-        <Route element={<AdminLayout />}>
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/produtos" element={<AdminProductsPage />} />
-          <Route path="/admin/votacoes" element={<AdminVotesPage />} />
-          <Route path="/admin/promocoes" element={<AdminPromotionsPage />} />
-          <Route path="/admin/cupons" element={<AdminCouponsPage />} />
-          <Route
-            path="/admin/produtos-dia"
-            element={<AdminFeaturedProductsPage mode="day" />}
-          />
-          <Route
-            path="/admin/produtos-semana"
-            element={<AdminFeaturedProductsPage mode="week" />}
-          />
-          <Route path="/admin/feedbacks" element={<AdminFeedbacksPage />} />
-          <Route path="/admin/avisos" element={<AdminNoticesPage />} />
-          <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
+        <Route element={<ProtectedRoute role="admin" />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/usuarios" element={<AdminUsersPage />} />
+            <Route path="/admin/produtos" element={<AdminProductsPage />} />
+            <Route path="/admin/votacoes" element={<AdminVotesPage />} />
+            <Route path="/admin/promocoes" element={<AdminPromotionsPage />} />
+            <Route path="/admin/cupons" element={<AdminCouponsPage />} />
+            <Route
+              path="/admin/produtos-dia"
+              element={<AdminFeaturedProductsPage mode="day" />}
+            />
+            <Route
+              path="/admin/produtos-semana"
+              element={<AdminFeaturedProductsPage mode="week" />}
+            />
+            <Route path="/admin/feedbacks" element={<AdminFeedbacksPage />} />
+            <Route path="/admin/avisos" element={<AdminNoticesPage />} />
+            <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
+          </Route>
         </Route>
-      </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
