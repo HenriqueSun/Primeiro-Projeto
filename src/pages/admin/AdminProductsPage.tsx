@@ -2,6 +2,7 @@ import { Copy, Edit, Plus, Trash2 } from "lucide-react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { MediaPicker } from "@/components/MediaPicker";
 import { PageHeader } from "@/components/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -344,13 +345,16 @@ function ProductFormFields({
           }
         />
       </Field>
-      <Field label="Foto">
-        <Input
-          value={form.imageUrl}
-          placeholder="/IMG/produto.png"
-          onChange={(event) => setForm((state) => ({ ...state, imageUrl: event.target.value }))}
-        />
-      </Field>
+      <div className="sm:col-span-2">
+        <Field label="Foto">
+          <MediaPicker
+            value={form.imageUrl}
+            usage="product"
+            allowDelete
+            onChange={(imageUrl) => setForm((state) => ({ ...state, imageUrl }))}
+          />
+        </Field>
+      </div>
       <Field label="Status">
         <Select
           value={form.status}

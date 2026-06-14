@@ -5,6 +5,7 @@ import {
   feedbacks,
   loyaltyAccount,
   marketingMetrics,
+  mediaAssets,
   notifications,
   products,
   promotions,
@@ -20,6 +21,7 @@ import type {
   LoyaltyAccount,
   LoginDTO,
   MarketingMetrics,
+  MediaAsset,
   Notification,
   Product,
   ProductStatus,
@@ -50,6 +52,7 @@ type AppState = {
   coupons: Coupon[];
   loyaltyAccount: LoyaltyAccount;
   marketingMetrics: MarketingMetrics;
+  mediaAssets: MediaAsset[];
   favoriteProductIds: string[];
   searchHistory: string[];
   settings: Settings;
@@ -58,6 +61,10 @@ type AppState = {
   registerUser: (dto: RegisterDTO) => User;
   updateProfile: (profile: Partial<User>) => void;
   requestPasswordReset: (email: string) => void;
+  addMediaAsset: (
+    asset: Omit<MediaAsset, "id" | "createdAt" | "uploadedBy">,
+  ) => MediaAsset;
+  deleteMediaAsset: (id: string) => void;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
   addProduct: (product: Product) => void;
@@ -90,7 +97,7 @@ type AppState = {
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       users,
       session: null,
@@ -103,6 +110,7 @@ export const useAppStore = create<AppState>()(
       coupons,
       loyaltyAccount,
       marketingMetrics,
+      mediaAssets,
       favoriteProductIds: ["p-1", "p-3"],
       searchHistory: ["brigadeiro", "bolo de pote"],
       settings,
@@ -204,6 +212,34 @@ export const useAppStore = create<AppState>()(
         if (!normalized.includes("@")) {
           throw new Error("Informe um e-mail válido.");
         }
+      },
+      addMediaAsset: (asset) => {
+        const existing = get().mediaAssets.find(
+          (item) =>
+            item.url === asset.url ||
+            (item.name === asset.name && item.size === asset.size && item.type === asset.type),
+        );
+
+        if (existing) return existing;
+
+        const nextAsset: MediaAsset = {
+          ...asset,
+          id: crypto.randomUUID(),
+          createdAt: new Date().toISOString().slice(0, 10),
+          uploadedBy: get().user?.id,
+        };
+
+        set((state) => ({ mediaAssets: [nextAsset, ...state.mediaAssets] }));
+        return nextAsset;
+      },
+      deleteMediaAsset: (id) => {
+        if (get().user?.role !== "admin") {
+          throw new Error("Somente administradores podem excluir fotos.");
+        }
+
+        set((state) => ({
+          mediaAssets: state.mediaAssets.filter((asset) => asset.id !== id),
+        }));
       },
       toggleSidebar: () =>
         set((state) => ({ sidebarOpen: !state.sidebarOpen })),
@@ -410,6 +446,7 @@ export const useAppStore = create<AppState>()(
         coupons: state.coupons,
         loyaltyAccount: state.loyaltyAccount,
         marketingMetrics: state.marketingMetrics,
+        mediaAssets: state.mediaAssets,
         favoriteProductIds: state.favoriteProductIds,
         searchHistory: state.searchHistory,
         settings: state.settings,

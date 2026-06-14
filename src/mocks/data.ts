@@ -5,6 +5,7 @@ import type {
   Feedback,
   LoyaltyAccount,
   MarketingMetrics,
+  MediaAsset,
   Notification,
   Product,
   Promotion,
@@ -47,6 +48,54 @@ export const users: User[] = [
       notifications: true,
       theme: "light",
     },
+  },
+];
+
+export const mediaAssets: MediaAsset[] = [
+  {
+    id: "media-1",
+    name: "Bolo de Festa Dona Lu",
+    url: "/IMG/Bolodefesta.png",
+    type: "image/png",
+    usage: "product",
+    createdAt: "2026-06-01",
+    uploadedBy: "admin-1",
+  },
+  {
+    id: "media-2",
+    name: "Bolo de Pote",
+    url: "/IMG/Bolodepote.png",
+    type: "image/png",
+    usage: "product",
+    createdAt: "2026-06-02",
+    uploadedBy: "admin-1",
+  },
+  {
+    id: "media-3",
+    name: "Brigadeiro Tradicional",
+    url: "/IMG/brigadeiro.png",
+    type: "image/png",
+    usage: "product",
+    createdAt: "2026-06-03",
+    uploadedBy: "admin-1",
+  },
+  {
+    id: "media-4",
+    name: "Beijinho",
+    url: "/IMG/bejinho.png",
+    type: "image/png",
+    usage: "product",
+    createdAt: "2026-06-03",
+    uploadedBy: "admin-1",
+  },
+  {
+    id: "media-5",
+    name: "Pudim da Casa",
+    url: "/IMG/pudim.png",
+    type: "image/png",
+    usage: "product",
+    createdAt: "2026-06-04",
+    uploadedBy: "admin-1",
   },
 ];
 

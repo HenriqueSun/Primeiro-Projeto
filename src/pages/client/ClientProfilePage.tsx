@@ -1,7 +1,7 @@
-import { Camera, Save, Trash2 } from "lucide-react";
-import type { ChangeEvent } from "react";
+import { Save } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { MediaPicker } from "@/components/MediaPicker";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,15 +38,6 @@ export function ClientProfilePage() {
     toast.success("Perfil atualizado.");
   };
 
-  const handleAvatarUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => setAvatar(String(reader.result));
-    reader.readAsDataURL(file);
-  };
-
   return (
     <div>
       <PageHeader
@@ -76,25 +67,8 @@ export function ClientProfilePage() {
             </div>
             <h2 className="mt-4 text-xl font-bold">{name}</h2>
             <p className="text-sm text-muted-foreground">{user?.email}</p>
-            <div className="mt-5 grid gap-2">
-              <Button variant="outline" className="w-full" asChild>
-                <label>
-                  <Camera className="h-4 w-4" />
-                  Alterar foto
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="sr-only"
-                    onChange={handleAvatarUpload}
-                  />
-                </label>
-              </Button>
-              {avatar ? (
-                <Button variant="ghost" className="w-full" onClick={() => setAvatar("")}>
-                  <Trash2 className="h-4 w-4" />
-                  Remover foto
-                </Button>
-              ) : null}
+            <div className="mt-5 text-left">
+              <MediaPicker value={avatar} usage="profile" onChange={setAvatar} />
             </div>
           </CardContent>
         </Card>

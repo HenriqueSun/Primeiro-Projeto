@@ -23,6 +23,19 @@ export type CouponStatus = "active" | "scheduled" | "expired";
 
 export type SocialPlatform = "instagram" | "whatsapp" | "facebook" | "tiktok";
 
+export type MediaUsage = "product" | "profile" | "general";
+
+export interface MediaAsset {
+  id: string;
+  name: string;
+  url: string;
+  type: string;
+  size?: number;
+  usage: MediaUsage;
+  createdAt: string;
+  uploadedBy?: string;
+}
+
 export interface User {
   id: string;
   name: string;
