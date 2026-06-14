@@ -13,7 +13,7 @@ const items = [
 export function MobileBottomNav() {
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-card/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-2xl backdrop-blur lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 gap-1 border-t border-border bg-card/90 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-elevated backdrop-blur-xl lg:hidden"
       aria-label="Navegação principal mobile"
     >
       {items.map((item) => (
@@ -23,8 +23,8 @@ export function MobileBottomNav() {
           end={item.href === "/cliente"}
           className={({ isActive }) =>
             cn(
-              "flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[11px] font-semibold text-muted-foreground",
-              isActive && "bg-secondary text-primary",
+              "flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl py-1.5 text-[11px] font-medium text-muted-foreground transition-all duration-200",
+              isActive && "bg-secondary font-semibold text-primary",
             )
           }
         >

@@ -10,21 +10,22 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wide text-primary">
+        <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary/80">
+          <span className="h-px w-6 bg-accent" aria-hidden="true" />
           Doceria Dona Lu
-        </p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
+        </span>
+        <h1 className="mt-2 text-pretty text-3xl font-semibold tracking-tight sm:text-4xl">
           {title}
         </h1>
         {description ? (
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          <p className="mt-2.5 max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">
             {description}
           </p>
         ) : null}
       </div>
-      {action ? <div>{action}</div> : null}
+      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
   );
 }

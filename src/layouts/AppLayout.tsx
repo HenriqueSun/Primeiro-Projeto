@@ -12,7 +12,6 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { Input } from "@/components/ui/form";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
@@ -70,22 +69,24 @@ export function AppLayout({ area, navItems }: AppLayoutProps) {
             </Button>
           </div>
 
-          <nav className="flex-1 space-y-1 px-3">
+          <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
             {navItems.map((item) => (
               <NavLink
                 key={item.href}
                 to={item.href}
                 end={item.href === `/${area}`}
+                title={!sidebarOpen ? item.label : undefined}
                 className={({ isActive }) =>
                   cn(
-                    "flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition hover:bg-secondary hover:text-secondary-foreground",
-                    isActive && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+                    "group flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-secondary hover:text-secondary-foreground",
+                    isActive &&
+                      "bg-primary text-primary-foreground shadow-soft hover:bg-primary hover:text-primary-foreground",
                     !sidebarOpen && "justify-center px-0",
                   )
                 }
               >
-                {item.icon}
-                {sidebarOpen ? <span>{item.label}</span> : null}
+                <span className="grid h-5 w-5 shrink-0 place-items-center">{item.icon}</span>
+                {sidebarOpen ? <span className="truncate">{item.label}</span> : null}
               </NavLink>
             ))}
           </nav>
@@ -116,11 +117,11 @@ export function AppLayout({ area, navItems }: AppLayoutProps) {
               <Menu className="h-5 w-5" />
             </Button>
 
-            <div className="hidden min-w-0 flex-1 items-center gap-3 rounded-xl border bg-card px-3 md:flex">
-              <Search className="h-4 w-4 text-muted-foreground" />
+            <div className="hidden min-w-0 max-w-md flex-1 items-center gap-2.5 rounded-full border border-border bg-card px-4 transition focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-ring/20 md:flex">
+              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <Input
                 aria-label="Busca global"
-                className="border-0 bg-transparent px-0 shadow-none focus:ring-0"
+                className="h-11 border-0 bg-transparent px-0 shadow-none focus:ring-0"
                 placeholder="Buscar produtos, votações, feedbacks..."
               />
             </div>
@@ -146,8 +147,8 @@ export function AppLayout({ area, navItems }: AppLayoutProps) {
               ) : null}
             </div>
 
-            <div className="flex items-center gap-3 rounded-full border bg-card px-3 py-2">
-              <div className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-sm font-bold text-primary">
+            <div className="flex items-center gap-3 rounded-full border border-border bg-card py-1.5 pl-1.5 pr-2 sm:pr-4">
+              <div className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
                 {user ? getInitials(user.name) : <UserCircle className="h-5 w-5" />}
               </div>
               <div className="hidden leading-tight sm:block">
@@ -228,13 +229,15 @@ export function AppLayout({ area, navItems }: AppLayoutProps) {
 function Brand({ name, compact = false }: { name: string; compact?: boolean }) {
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary text-lg font-black text-primary-foreground shadow-sm">
+      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary font-serif text-lg font-semibold text-primary-foreground shadow-soft">
         DL
       </div>
       {!compact ? (
         <div className="min-w-0">
-          <p className="truncate font-bold text-primary">{name}</p>
-          <Badge variant="secondary">Gestão de Doceria</Badge>
+          <p className="truncate font-serif text-base font-semibold text-primary">{name}</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            Gestão de Doceria
+          </p>
         </div>
       ) : null}
     </div>
