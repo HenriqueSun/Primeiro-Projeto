@@ -29,6 +29,7 @@ export function AdminNoticesPage() {
 
     addNotification({
       id: crypto.randomUUID(),
+      type: "announcement",
       title: form.title,
       message: form.expireDate
         ? `${form.message} Expira em ${formatDate(form.expireDate)}.`

@@ -1,7 +1,10 @@
 import type {
   Banner,
+  Coupon,
   DashboardKpis,
   Feedback,
+  LoyaltyAccount,
+  MarketingMetrics,
   Notification,
   Product,
   Promotion,
@@ -45,6 +48,10 @@ export const products: Product[] = [
     price: 89.9,
     imageUrl: "/IMG/Bolodefesta.png",
     status: "available",
+    badges: ["best_seller", "weekly"],
+    promotionLabel: "Mais vendido",
+    views: 348,
+    favoriteCount: 76,
     featuredWeek: true,
     productOfDay: false,
     createdAt: "2026-06-01",
@@ -60,6 +67,10 @@ export const products: Product[] = [
     price: 14.9,
     imageUrl: "/IMG/Bolodepote.png",
     status: "available",
+    badges: ["promotion", "new"],
+    promotionLabel: "Combo com 10% off",
+    views: 284,
+    favoriteCount: 61,
     featuredWeek: false,
     productOfDay: true,
     scheduledDay: "2026-06-14",
@@ -76,6 +87,10 @@ export const products: Product[] = [
     price: 4.5,
     imageUrl: "/IMG/brigadeiro.png",
     status: "available",
+    badges: ["best_seller", "weekly"],
+    promotionLabel: "Leve 12 pague 10",
+    views: 512,
+    favoriteCount: 118,
     featuredWeek: true,
     productOfDay: false,
     createdAt: "2026-06-03",
@@ -91,6 +106,9 @@ export const products: Product[] = [
     price: 4.5,
     imageUrl: "/IMG/bejinho.png",
     status: "available",
+    badges: ["new"],
+    views: 176,
+    favoriteCount: 34,
     featuredWeek: false,
     productOfDay: false,
     createdAt: "2026-06-03",
@@ -106,6 +124,9 @@ export const products: Product[] = [
     price: 12.9,
     imageUrl: "/IMG/pudim.png",
     status: "sold_out",
+    badges: ["weekly"],
+    views: 229,
+    favoriteCount: 47,
     featuredWeek: true,
     productOfDay: false,
     createdAt: "2026-06-04",
@@ -121,6 +142,10 @@ export const products: Product[] = [
     price: 7.9,
     imageUrl: "/IMG/coxinha.png",
     status: "available",
+    badges: ["promotion"],
+    promotionLabel: "Especial do dia",
+    views: 301,
+    favoriteCount: 58,
     featuredWeek: false,
     productOfDay: true,
     scheduledDay: "2026-06-14",
@@ -182,6 +207,7 @@ export const promotions: Promotion[] = [
 export const notifications: Notification[] = [
   {
     id: "n-1",
+    type: "vote_result",
     title: "Nova votação disponível",
     message: "Vote no próximo produto especial da doceria.",
     read: false,
@@ -189,10 +215,28 @@ export const notifications: Notification[] = [
   },
   {
     id: "n-2",
+    type: "promotion",
     title: "Produto do dia",
     message: "Bolo de pote com preço especial hoje.",
     read: true,
     createdAt: "2026-06-13",
+  },
+  {
+    id: "n-3",
+    type: "product_available",
+    title: "Produto voltou ao estoque",
+    message: "O Cheesecake de Morango voltou ao estoque para encomendas.",
+    read: false,
+    createdAt: "2026-06-14",
+    href: "/cliente/cardapio",
+  },
+  {
+    id: "n-4",
+    type: "announcement",
+    title: "Horário especial",
+    message: "Neste feriado atenderemos das 9h às 13h.",
+    read: true,
+    createdAt: "2026-06-10",
   },
 ];
 
@@ -202,6 +246,12 @@ export const settings: Settings = {
   phone: "(11) 98633-7175",
   whatsappUrl: "https://api.whatsapp.com/send?phone=5511986337175",
   instagramUrl: "https://www.instagram.com/doceriadonaluoficial",
+  facebookUrl: "https://www.facebook.com/doceriadonalu",
+  tiktokUrl: "https://www.tiktok.com/@doceriadonalu",
+  customLinks: [
+    { label: "Encomendas", url: "https://api.whatsapp.com/send?phone=5511986337175" },
+    { label: "Localização", url: "https://www.google.com.br/maps" },
+  ],
   address: "Rua João Batista da Silva, 65",
   openingHours: "Segunda a sábado, das 9h às 18h",
   institutionalText:
@@ -225,7 +275,80 @@ export const banners: Banner[] = [
     ctaLabel: "Conferir",
     ctaHref: "/cliente",
   },
+  {
+    id: "banner-3",
+    title: "Brownies com 15% off",
+    subtitle: "Promoção relâmpago para pedidos pelo WhatsApp hoje.",
+    ctaLabel: "Fale conosco",
+    ctaHref: settings.whatsappUrl,
+  },
+  {
+    id: "banner-4",
+    title: "Festival de Brigadeiros",
+    subtitle: "Monte sua caixa personalizada com sabores favoritos.",
+    ctaLabel: "Ver doces",
+    ctaHref: "/cliente/cardapio",
+  },
 ];
+
+export const coupons: Coupon[] = [
+  {
+    id: "c-1",
+    code: "DONA10",
+    title: "Primeira encomenda",
+    description: "Ganhe desconto em bolos e doces para sua primeira encomenda.",
+    discount: "10%",
+    validUntil: "2026-06-30",
+    status: "active",
+  },
+  {
+    id: "c-2",
+    code: "FESTA15",
+    title: "Kit festa",
+    description: "Desconto especial em pedidos com doces e salgados.",
+    discount: "15%",
+    validUntil: "2026-07-15",
+    status: "active",
+  },
+];
+
+export const loyaltyAccount: LoyaltyAccount = {
+  userId: "client-1",
+  points: 320,
+  nextReward: {
+    title: "Caixa com 6 brigadeiros grátis",
+    requiredPoints: 500,
+  },
+  benefits: ["Descontos exclusivos", "Produtos grátis", "Brindes em datas especiais", "Cupons antecipados"],
+  history: [
+    {
+      id: "lh-1",
+      description: "Compra simulada de bolo de pote",
+      points: 42,
+      createdAt: "2026-06-12",
+    },
+    {
+      id: "lh-2",
+      description: "Bônus por votar em produto",
+      points: 20,
+      createdAt: "2026-06-10",
+    },
+  ],
+};
+
+export const marketingMetrics: MarketingMetrics = {
+  whatsappClicks: 146,
+  instagramClicks: 91,
+  facebookClicks: 34,
+  tiktokClicks: 27,
+  shareClicks: 58,
+  favoriteAdds: 112,
+  productViews: products.reduce<Record<string, number>>((acc, product) => {
+    acc[product.id] = product.views;
+    return acc;
+  }, {}),
+  engagementRate: 18.7,
+};
 
 export const dashboardKpis: DashboardKpis = {
   totalProducts: products.length,

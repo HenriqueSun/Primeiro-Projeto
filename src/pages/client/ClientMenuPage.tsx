@@ -1,4 +1,4 @@
-import { LayoutGrid, List, Search } from "lucide-react";
+import { Clock, Flame, LayoutGrid, List, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { ProductCard } from "@/components/ProductCard";
@@ -23,6 +23,10 @@ const categories: Array<ProductCategory | "Todas"> = [
 
 export function ClientMenuPage() {
   const products = useAppStore((state) => state.products);
+  const searchHistory = useAppStore((state) => state.searchHistory);
+  const addSearchTerm = useAppStore((state) => state.addSearchTerm);
+  const clearSearchHistory = useAppStore((state) => state.clearSearchHistory);
+  const trackProductView = useAppStore((state) => state.trackProductView);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ProductCategory | "Todas">("Todas");
   const [status, setStatus] = useState<ProductStatus | "all">("all");
@@ -48,6 +52,22 @@ export function ClientMenuPage() {
       }),
     [category, price, products, query, status],
   );
+  const suggestions = useMemo(
+    () =>
+      products
+        .filter((product) =>
+          product.name.toLowerCase().includes(query.toLowerCase()),
+        )
+        .slice(0, 4),
+    [products, query],
+  );
+  const popularProducts = [...products].sort((a, b) => b.views - a.views).slice(0, 4);
+
+  const openDetails = (product: Product) => {
+    trackProductView(product.id);
+    addSearchTerm(product.name);
+    setSelectedProduct(product);
+  };
 
   return (
     <div>
@@ -67,7 +87,10 @@ export function ClientMenuPage() {
                 className="pl-9"
                 placeholder="Buscar por nome"
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  addSearchTerm(event.target.value);
+                }}
               />
             </div>
           </div>
@@ -125,6 +148,57 @@ export function ClientMenuPage() {
         </CardContent>
       </Card>
 
+      <div className="mb-5 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardContent className="p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="flex items-center gap-2 font-semibold">
+                <Clock className="h-4 w-4 text-primary" />
+                Histórico de busca
+              </p>
+              {searchHistory.length ? (
+                <Button variant="ghost" size="sm" onClick={clearSearchHistory}>
+                  <X className="h-4 w-4" />
+                  Limpar
+                </Button>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {searchHistory.length ? (
+                searchHistory.map((term) => (
+                  <Button key={term} variant="secondary" size="sm" onClick={() => setQuery(term)}>
+                    {term}
+                  </Button>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">Suas buscas aparecem aqui.</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <p className="mb-3 flex items-center gap-2 font-semibold">
+              <Flame className="h-4 w-4 text-primary" />
+              Produtos populares
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(query ? suggestions : popularProducts).map((product) => (
+                <Button
+                  key={product.id}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => openDetails(product)}
+                >
+                  {product.name}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {filteredProducts.length ? (
         <div
           className={cn(
@@ -135,20 +209,17 @@ export function ClientMenuPage() {
         >
           {filteredProducts.map((product) =>
             view === "grid" ? (
-              <button
+              <div
                 key={product.id}
-                type="button"
-                className="text-left"
-                onClick={() => setSelectedProduct(product)}
               >
-                <ProductCard product={product} />
-              </button>
+                <ProductCard product={product} onDetails={openDetails} />
+              </div>
             ) : (
               <button
                 key={product.id}
                 type="button"
                 className="w-full rounded-xl border bg-card p-4 text-left transition hover:bg-secondary/50"
-                onClick={() => setSelectedProduct(product)}
+                onClick={() => openDetails(product)}
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
@@ -187,6 +258,9 @@ export function ClientMenuPage() {
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary">{selectedProduct.category}</Badge>
               <Badge>{selectedProduct.status === "available" ? "Disponível" : "Esgotado"}</Badge>
+              {(selectedProduct.badges ?? []).map((badge) => (
+                <Badge key={badge} variant="secondary">{badge}</Badge>
+              ))}
             </div>
             <p className="text-2xl font-bold text-primary">
               {formatCurrency(selectedProduct.price)}

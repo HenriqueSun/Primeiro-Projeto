@@ -10,6 +10,19 @@ export type FeedbackStatus = "new" | "reviewing" | "resolved";
 
 export type VoteStatus = "scheduled" | "active" | "closed";
 
+export type ProductBadge = "promotion" | "best_seller" | "new" | "weekly";
+
+export type NotificationType =
+  | "promotion"
+  | "product_available"
+  | "vote_result"
+  | "news"
+  | "announcement";
+
+export type CouponStatus = "active" | "scheduled" | "expired";
+
+export type SocialPlatform = "instagram" | "whatsapp" | "facebook" | "tiktok";
+
 export interface User {
   id: string;
   name: string;
@@ -37,6 +50,10 @@ export interface Product {
   price: number;
   imageUrl?: string;
   status: ProductStatus;
+  badges: ProductBadge[];
+  promotionLabel?: string;
+  views: number;
+  favoriteCount: number;
   featuredWeek: boolean;
   productOfDay: boolean;
   scheduledDay?: string;
@@ -89,10 +106,12 @@ export interface Promotion {
 
 export interface Notification {
   id: string;
+  type: NotificationType;
   title: string;
   message: string;
   read: boolean;
   createdAt: string;
+  href?: string;
 }
 
 export interface Banner {
@@ -110,10 +129,55 @@ export interface Settings {
   phone: string;
   whatsappUrl: string;
   instagramUrl: string;
+  facebookUrl: string;
+  tiktokUrl: string;
+  customLinks: Array<{
+    label: string;
+    url: string;
+  }>;
   address: string;
   openingHours: string;
   heroBanner: Banner;
   institutionalText: string;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  discount: string;
+  validUntil: string;
+  status: CouponStatus;
+}
+
+export interface LoyaltyHistoryItem {
+  id: string;
+  description: string;
+  points: number;
+  createdAt: string;
+}
+
+export interface LoyaltyAccount {
+  userId: string;
+  points: number;
+  nextReward: {
+    title: string;
+    requiredPoints: number;
+  };
+  benefits: string[];
+  history: LoyaltyHistoryItem[];
+}
+
+export interface MarketingMetrics {
+  whatsappClicks: number;
+  instagramClicks: number;
+  facebookClicks: number;
+  tiktokClicks: number;
+  shareClicks: number;
+  favoriteAdds: number;
+  productViews: Record<string, number>;
+  engagementRate: number;
 }
 
 export interface DashboardKpis {

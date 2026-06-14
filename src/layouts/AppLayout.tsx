@@ -9,10 +9,15 @@ import {
   UserCircle,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { Input } from "@/components/ui/form";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { NotificationCenter } from "@/components/NotificationCenter";
+import { SocialLinks } from "@/components/SocialLinks";
 import { useAppStore } from "@/store/appStore";
 import { cn } from "@/utils/cn";
 import { getInitials } from "@/utils/formatters";
@@ -30,6 +35,7 @@ type AppLayoutProps = {
 
 export function AppLayout({ area, navItems }: AppLayoutProps) {
   const navigate = useNavigate();
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const user = useAppStore((state) => state.user);
   const settings = useAppStore((state) => state.settings);
   const notifications = useAppStore((state) => state.notifications);
@@ -37,6 +43,7 @@ export function AppLayout({ area, navItems }: AppLayoutProps) {
   const toggleSidebar = useAppStore((state) => state.toggleSidebar);
   const setSidebarOpen = useAppStore((state) => state.setSidebarOpen);
   const setUser = useAppStore((state) => state.setUser);
+  const unreadCount = notifications.filter((item) => !item.read).length;
 
   const logout = () => {
     setUser(null);
@@ -81,7 +88,8 @@ export function AppLayout({ area, navItems }: AppLayoutProps) {
             ))}
           </nav>
 
-          <div className="border-t p-3">
+          <div className="space-y-3 border-t p-3">
+            {sidebarOpen ? <SocialLinks /> : <SocialLinks compact />}
             <Button
               variant="ghost"
               className={cn("w-full", !sidebarOpen && "px-0")}
@@ -121,11 +129,18 @@ export function AppLayout({ area, navItems }: AppLayoutProps) {
             </Button>
 
             <div className="relative">
-              <Button variant="ghost" size="icon" aria-label="Notificações">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Abrir notificações"
+                onClick={() => setNotificationOpen(true)}
+              >
                 <Bell className="h-5 w-5" />
               </Button>
-              {notifications.some((item) => !item.read) ? (
-                <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-primary" />
+              {unreadCount ? (
+                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                  {unreadCount}
+                </span>
               ) : null}
             </div>
 
@@ -188,15 +203,22 @@ export function AppLayout({ area, navItems }: AppLayoutProps) {
                     </NavLink>
                   ))}
                 </nav>
+                <div className="mt-6 border-t pt-4">
+                  <p className="mb-3 text-sm font-semibold">Redes sociais</p>
+                  <SocialLinks />
+                </div>
               </motion.aside>
             </motion.div>
           ) : null}
         </AnimatePresence>
 
-        <main className="px-4 py-6 sm:px-6 lg:px-8">
+        <main className={cn("px-4 py-6 sm:px-6 lg:px-8", area === "cliente" && "pb-28 lg:pb-8")}>
           <Outlet />
         </main>
       </div>
+      <NotificationCenter open={notificationOpen} onClose={() => setNotificationOpen(false)} />
+      <FloatingWhatsApp />
+      {area === "cliente" ? <MobileBottomNav /> : null}
     </div>
   );
 }

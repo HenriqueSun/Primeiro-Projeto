@@ -11,7 +11,12 @@ import { useAppStore } from "@/store/appStore";
 export function AdminSettingsPage() {
   const settings = useAppStore((state) => state.settings);
   const updateSettings = useAppStore((state) => state.updateSettings);
-  const [form, setForm] = useState(settings);
+  const [form, setForm] = useState({
+    ...settings,
+    facebookUrl: settings.facebookUrl ?? "",
+    tiktokUrl: settings.tiktokUrl ?? "",
+    customLinks: settings.customLinks ?? [],
+  });
 
   const save = () => {
     updateSettings(form);
@@ -93,6 +98,80 @@ export function AdminSettingsPage() {
                 }
               />
             </Field>
+            <Field label="Facebook">
+              <Input
+                value={form.facebookUrl ?? ""}
+                onChange={(event) =>
+                  setForm((state) => ({ ...state, facebookUrl: event.target.value }))
+                }
+              />
+            </Field>
+            <Field label="TikTok">
+              <Input
+                value={form.tiktokUrl ?? ""}
+                onChange={(event) =>
+                  setForm((state) => ({ ...state, tiktokUrl: event.target.value }))
+                }
+              />
+            </Field>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Links personalizados</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {(form.customLinks ?? []).map((link, index) => (
+              <div key={`${link.label}-${index}`} className="grid gap-3 sm:grid-cols-[1fr_2fr_auto]">
+                <Input
+                  aria-label="Nome do link"
+                  value={link.label}
+                  onChange={(event) =>
+                    setForm((state) => ({
+                      ...state,
+                      customLinks: state.customLinks.map((item, itemIndex) =>
+                        itemIndex === index ? { ...item, label: event.target.value } : item,
+                      ),
+                    }))
+                  }
+                />
+                <Input
+                  aria-label="URL do link"
+                  value={link.url}
+                  onChange={(event) =>
+                    setForm((state) => ({
+                      ...state,
+                      customLinks: state.customLinks.map((item, itemIndex) =>
+                        itemIndex === index ? { ...item, url: event.target.value } : item,
+                      ),
+                    }))
+                  }
+                />
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setForm((state) => ({
+                      ...state,
+                      customLinks: state.customLinks.filter((_, itemIndex) => itemIndex !== index),
+                    }))
+                  }
+                >
+                  Remover
+                </Button>
+              </div>
+            ))}
+            <Button
+              variant="secondary"
+              onClick={() =>
+                setForm((state) => ({
+                  ...state,
+                  customLinks: [...(state.customLinks ?? []), { label: "Novo link", url: "https://" }],
+                }))
+              }
+            >
+              Adicionar link
+            </Button>
           </CardContent>
         </Card>
 

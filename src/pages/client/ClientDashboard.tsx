@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { BellRing, CalendarDays, Flame, Star } from "lucide-react";
+import { BellRing, CalendarDays, Flame, Gift, Instagram, Star, Trophy } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
 import { PageHeader } from "@/components/PageHeader";
+import { SocialLinks } from "@/components/SocialLinks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getBanners } from "@/services/mockApi";
@@ -11,6 +14,8 @@ import { useAppStore } from "@/store/appStore";
 export function ClientDashboard() {
   const products = useAppStore((state) => state.products);
   const notifications = useAppStore((state) => state.notifications);
+  const coupons = useAppStore((state) => state.coupons);
+  const loyalty = useAppStore((state) => state.loyaltyAccount);
   const { data: banners, isLoading } = useQuery({
     queryKey: ["banners"],
     queryFn: getBanners,
@@ -18,6 +23,22 @@ export function ClientDashboard() {
 
   const featured = products.filter((product) => product.featuredWeek);
   const productOfDay = products.filter((product) => product.productOfDay);
+  const [activeBanner, setActiveBanner] = useState(0);
+  const currentBanner = banners?.[activeBanner] ?? banners?.[0];
+  const loyaltyProgress = Math.min(
+    Math.round((loyalty.points / loyalty.nextReward.requiredPoints) * 100),
+    100,
+  );
+
+  useEffect(() => {
+    if (!banners?.length) return;
+
+    const timer = window.setInterval(() => {
+      setActiveBanner((current) => (current + 1) % banners.length);
+    }, 4500);
+
+    return () => window.clearInterval(timer);
+  }, [banners]);
 
   return (
     <div>
@@ -37,12 +58,27 @@ export function ClientDashboard() {
                 Promoções da semana
               </div>
               <h2 className="max-w-3xl text-balance text-3xl font-black sm:text-5xl">
-                {banners?.[0]?.title}
+                {currentBanner?.title}
               </h2>
               <p className="max-w-2xl text-primary-foreground/80">
-                {banners?.[0]?.subtitle}
+                {currentBanner?.subtitle}
               </p>
-              <Button variant="secondary">Ver cardápio completo</Button>
+              <Button variant="secondary" asChild>
+                <Link to={currentBanner?.ctaHref ?? "/cliente/cardapio"}>
+                  {currentBanner?.ctaLabel ?? "Ver cardápio"}
+                </Link>
+              </Button>
+              <div className="flex gap-2">
+                {banners?.map((banner, index) => (
+                  <button
+                    key={banner.id}
+                    type="button"
+                    aria-label={`Ver banner ${index + 1}`}
+                    className={`h-2.5 rounded-full transition ${index === activeBanner ? "w-8 bg-white" : "w-2.5 bg-white/40"}`}
+                    onClick={() => setActiveBanner(index)}
+                  />
+                ))}
+              </div>
             </div>
             <div className="rounded-2xl bg-white/10 p-5">
               <p className="text-sm uppercase tracking-wide text-primary-foreground/70">
@@ -69,6 +105,62 @@ export function ClientDashboard() {
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
+      </section>
+
+      <section className="mb-8 grid gap-4 lg:grid-cols-3">
+        <Card className="bg-primary text-primary-foreground">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5" />
+              Fidelidade Dona Lu
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-black">{loyalty.points} pontos</p>
+            <p className="mt-2 text-sm text-primary-foreground/80">
+              Próxima recompensa: {loyalty.nextReward.title}
+            </p>
+            <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/20">
+              <div className="h-full bg-white" style={{ width: `${loyaltyProgress}%` }} />
+            </div>
+            <Button className="mt-4 w-full" variant="secondary" asChild>
+              <Link to="/cliente/fidelidade">Ver benefícios</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Gift className="h-5 w-5 text-primary" />
+              Cupons disponíveis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-black text-primary">{coupons.length}</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Use em encomendas futuras e campanhas especiais.
+            </p>
+            <Button className="mt-4 w-full" variant="outline" asChild>
+              <Link to="/cliente/cupons">Ver cupons</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Instagram className="h-5 w-5 text-primary" />
+              Acompanhe a doceria
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Promoções, bastidores e novidades nas redes sociais.
+            </p>
+            <SocialLinks />
+          </CardContent>
+        </Card>
       </section>
 
       <section className="mb-8">

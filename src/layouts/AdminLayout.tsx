@@ -1,4 +1,5 @@
 import {
+  BadgePercent,
   BellRing,
   CalendarDays,
   Gift,
@@ -27,6 +28,11 @@ const navItems = [
     label: "Promoções",
     href: "/admin/promocoes",
     icon: <Gift className="h-5 w-5" />,
+  },
+  {
+    label: "Cupons",
+    href: "/admin/cupons",
+    icon: <BadgePercent className="h-5 w-5" />,
   },
   {
     label: "Produtos do Dia",
