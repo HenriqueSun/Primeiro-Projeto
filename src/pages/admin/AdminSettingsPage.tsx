@@ -9,8 +9,7 @@ import { Input, Label, Textarea } from "@/components/ui/form";
 import { emptySettings, useSettings, useSettingsMutation } from "@/hooks/useSettings";
 
 export function AdminSettingsPage() {
-  const { data } = useSettings();
-  const settings = data ?? emptySettings;
+  const { data: settings = emptySettings } = useSettings();
   const updateSettings = useSettingsMutation();
   const [form, setForm] = useState({
     ...settings,
