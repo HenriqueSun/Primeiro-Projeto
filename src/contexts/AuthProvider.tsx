@@ -1,5 +1,5 @@
 import type { User as FirebaseUser } from "firebase/auth";
-import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   login as firebaseLogin,
   logout as firebaseLogout,
@@ -34,13 +34,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  // Cache local de perfis definidos manualmente (login/register).
+  // Evita que o listener de auth apague o usuário quando o documento
+  // do Firestore ainda não terminou de ser criado/propagado.
+  const localProfilesRef = useRef<Map<string, User>>(new Map());
+
+  const rememberProfile = (uid: string, profile: User) => {
+    localProfilesRef.current.set(uid, profile);
+  };
 
   const refreshProfile = async () => {
     const currentUser = firebaseUser;
     if (!currentUser) return;
 
     const profile = await getUserProfile(currentUser.uid);
-    setUser(profile);
+    if (profile) {
+      rememberProfile(currentUser.uid, profile);
+      setUser(profile);
+    }
   };
 
   useEffect(() => {
@@ -49,13 +60,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setFirebaseUser(nextFirebaseUser);
 
       if (!nextFirebaseUser) {
+        localProfilesRef.current.clear();
         setUser(null);
         setLoading(false);
         return;
       }
 
       try {
-        setUser(await getUserProfile(nextFirebaseUser.uid));
+        const profile =
+          (await getUserProfile(nextFirebaseUser.uid)) ??
+          localProfilesRef.current.get(nextFirebaseUser.uid) ??
+          null;
+
+        if (profile) {
+          rememberProfile(nextFirebaseUser.uid, profile);
+        }
+
+        setUser(profile);
       } finally {
         setLoading(false);
       }
@@ -77,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             throw new Error("Perfil não encontrado no Firestore.");
           }
 
+          rememberProfile(credential.user.uid, profile);
           setUser(profile);
           return profile;
         } catch (error) {
@@ -87,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const credential = await firebaseRegister(dto.email, dto.password, dto.fullName);
           const profile = await createUserProfile(credential.user.uid, dto, credential.user.email ?? dto.email);
+          rememberProfile(credential.user.uid, profile);
           setUser(profile);
           return profile;
         } catch (error) {
