@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Apple, ArrowRight, CakeSlice, Globe, Lock, Mail, Share2 } from "lucide-react";
+import { Apple, ArrowRight, CakeSlice, Chrome, Lock, Mail, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -102,7 +102,7 @@ export function LoginPage() {
           <CardContent>
             <div className="mb-4 grid gap-2 sm:grid-cols-3">
               {[
-                { icon: <Globe className="h-4 w-4" />, label: "Google" },
+                { icon: <Chrome className="h-4 w-4" />, label: "Google" },
                 { icon: <Apple className="h-4 w-4" />, label: "Apple" },
                 { icon: <Share2 className="h-4 w-4" />, label: "Facebook" },
               ].map((item) => (
