@@ -11,7 +11,7 @@ export async function createVote(vote: Vote) {
 }
 
 export async function updateVote(vote: Vote) {
-  await updateDoc(documentRef("votes", vote.id), cleanUndefined(vote));
+  await updateDoc(documentRef("votes", vote.id), cleanUndefined({ ...vote }));
 }
 
 export async function removeVote(id: string) {

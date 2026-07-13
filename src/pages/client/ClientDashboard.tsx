@@ -16,7 +16,8 @@ export function ClientDashboard() {
   const { data: products = [] } = useProducts();
   const { data: notifications = [] } = useNotifications(user?.id);
   const { data: coupons = [] } = useCoupons();
-  const { data: settings = emptySettings } = useSettings();
+  const { data: settingsData } = useSettings();
+  const settings = settingsData ?? emptySettings;
 
   const featured = products.filter((product) => product.featuredWeek);
   const productOfDay = products.filter((product) => product.productOfDay);
