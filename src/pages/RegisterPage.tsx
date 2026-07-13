@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Apple, ArrowRight, CheckCircle2, Globe, Eye, EyeOff, Lock, Mail, Phone, Share2, UserRound, XCircle } from "lucide-react";
+import { Apple, ArrowRight, CheckCircle2, Chrome, Eye, EyeOff, Lock, Mail, Phone, Share2, UserRound, XCircle } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -108,7 +108,7 @@ export function RegisterPage() {
           <CardContent>
             <div className="mb-4 grid gap-2 sm:grid-cols-3">
               {[
-                { icon: <Globe className="h-4 w-4" />, label: "Google" },
+                { icon: <Chrome className="h-4 w-4" />, label: "Google" },
                 { icon: <Apple className="h-4 w-4" />, label: "Apple" },
                 { icon: <Share2 className="h-4 w-4" />, label: "Facebook" },
               ].map((item) => (
