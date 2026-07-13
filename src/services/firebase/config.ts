@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { initializeFirestore } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -14,10 +14,5 @@ const firebaseConfig = {
 
 export const firebaseApp = initializeApp(firebaseConfig);
 export const auth = getAuth(firebaseApp);
-// Em ambientes com proxy (como o preview), o transporte WebChannel padrão do
-// Firestore costuma ser bloqueado, resultando em "client is offline".
-// Detectar/forçar long polling contorna esse problema de conectividade.
-export const db = initializeFirestore(firebaseApp, {
-  experimentalAutoDetectLongPolling: true,
-});
+export const db = getFirestore(firebaseApp);
 export const storage = getStorage(firebaseApp);
