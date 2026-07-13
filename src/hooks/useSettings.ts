@@ -26,7 +26,7 @@ export const emptySettings: Settings = {
 export function useSettings() {
   return useQuery({
     queryKey: ["settings"],
-    queryFn: getSettings,
+    queryFn: async () => (await getSettings()) ?? emptySettings,
   });
 }
 
