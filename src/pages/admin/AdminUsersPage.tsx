@@ -111,7 +111,7 @@ export function AdminUsersPage() {
                         {user.role === "admin" ? "Admin" : "Cliente"}
                       </Badge>
                       {user.marketingConsent ? (
-                        <Badge variant="secondary">Marketing aceito</Badge>
+                        <Badge variant="outline">Marketing aceito</Badge>
                       ) : null}
                     </div>
                     <div className="mt-2 grid gap-1 text-sm text-muted-foreground sm:grid-cols-2">
