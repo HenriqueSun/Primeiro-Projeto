@@ -8,7 +8,7 @@ const observer = new IntersectionObserver((entries) => {
     } else {
       entry.target.classList.remove('visivel');
       entry.target.classList.add('invisivel');
-    } 
+    }
   });
 }, { threshold: 0.2 });
 
